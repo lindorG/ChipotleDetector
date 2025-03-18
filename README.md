@@ -75,7 +75,7 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 ## Version History
 
-- **1.0.0**
+- **3.0.0**
   - Initial release
   - Automatic giveaway detection and Discord notifications
 

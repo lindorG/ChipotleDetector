@@ -8,17 +8,17 @@ from config import (
     REDDIT_CLIENT_SECRET,
     REDDIT_USER_AGENT,
     DISCORD_BOT_TOKEN,
-    DISCORD_CHANNEL_ID
+    DISCORD_CHANNEL_ID,
+    ROLE_ID
 )
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
 reddit = None  
-posted_posts = set() 
+posted_posts = set()  
 
 async def fetch_giveaways():
-    """Fetches new giveaway posts from r/Chipotle and prevents reposting."""
     global reddit, posted_posts
     try:
         subreddit = await reddit.subreddit("Chipotle")
@@ -33,6 +33,8 @@ async def fetch_giveaways():
                     print(f"Error: Could not find channel {DISCORD_CHANNEL_ID}")
                     return
 
+                role_mention = f"<@&{ROLE_ID}>"
+
                 embed = discord.Embed(
                     title=submission.title,
                     url=submission.url,
@@ -44,8 +46,7 @@ async def fetch_giveaways():
                 if submission.url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
                     embed.set_image(url=submission.url)
 
-                await channel.send(embed=embed)
-
+                await channel.send(f"{role_mention} 🚨 New Chipotle Giveaway Alert! 🚨", embed=embed)
                 posted_posts.add(submission.id)
 
     except Exception as e:
@@ -53,12 +54,10 @@ async def fetch_giveaways():
 
 @tasks.loop(minutes=1)
 async def check_reddit():
-    """Scheduled task that checks Reddit for new giveaway posts."""
     await fetch_giveaways()
 
 @client.event
 async def on_ready():
-    """Initializes the Reddit API session and starts the checking loop."""
     global reddit
     print(f"Logged in as {client.user}")
 
